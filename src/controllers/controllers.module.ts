@@ -5,10 +5,11 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { AccidenteController } from "./AccidenteController";
 import { FamiliarController } from "./FamiliarController";
 import { PoliciaController } from "./PoliciaController";
+import { SeguroController } from "./SeguroController";
 
 
 @Module({
   imports:[UsecasesModule],
-  controllers:[UsuarioController,AccidenteController,FamiliarController,PoliciaController]
+  controllers:[UsuarioController,AccidenteController,FamiliarController,PoliciaController,SeguroController]
 })
 export class ControllersModule {}
