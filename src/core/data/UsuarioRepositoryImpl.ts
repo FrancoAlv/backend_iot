@@ -7,6 +7,10 @@ import { UsuarioRepository } from '../repositories/UsuarioRepository';
 export class UsuarioRepositoryImpl implements IUsuarioRepository {
   constructor(private readonly usuarioRepository: UsuarioRepository) {}
 
+  async findById(usuarioId:number): Promise<Usuario> {
+    return await this.usuarioRepository.findById(usuarioId);
+  }
+
   async create(usuario: Usuario): Promise<Usuario> {
     return await this.usuarioRepository.create(usuario);
   }

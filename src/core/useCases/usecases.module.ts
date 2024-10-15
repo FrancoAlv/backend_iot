@@ -3,11 +3,12 @@ import { DataModule } from "../data/Data.module";
 import { CreateUserUseCase } from "./CreateUserUseCase";
 import { AccidenteUseCase } from "./AccidenteUseCase";
 import { ServicesModule } from "../../services/services.module";
+import { FamiliarUseCase } from "./FamiliarUseCase";
 
 
 @Module({
   imports: [DataModule,ServicesModule],
-  exports:[CreateUserUseCase,AccidenteUseCase],
-  providers: [CreateUserUseCase,AccidenteUseCase]
+  exports:[CreateUserUseCase,AccidenteUseCase,FamiliarUseCase],
+  providers: [CreateUserUseCase,AccidenteUseCase,FamiliarUseCase]
 })
 export class UsecasesModule{}

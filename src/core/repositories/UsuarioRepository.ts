@@ -21,4 +21,12 @@ export class UsuarioRepository {
   async findAll(): Promise<Usuario[] | null> {
     return await this.repository.find();
   }
+
+  async findById(usuarioId: number)  :Promise<Usuario | null>{
+    return await this.repository.findOne({
+     where:{
+       usuario_id: usuarioId,
+     }
+    });
+  }
 }
