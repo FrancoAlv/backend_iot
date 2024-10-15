@@ -13,7 +13,7 @@ import { Seguro } from "./core/entities/Seguro";
 import { Policia } from "./core/entities/Policia";
 import { ConfigModule } from "@nestjs/config";
 import configuration from "./config/configuration";
-import { UsuarioModule } from "./controllers/usuario.module";
+import { ControllersModule } from "./controllers/controllers.module";
 
 @Module({
   imports: [
@@ -21,7 +21,7 @@ import { UsuarioModule } from "./controllers/usuario.module";
       isGlobal: true,
       load: [configuration],
     }),
-    UsuarioModule,
+    ControllersModule,
     TypeOrmModule.forRoot({
       type: 'mssql',
       host: process.env.DB_HOST,
@@ -31,7 +31,7 @@ import { UsuarioModule } from "./controllers/usuario.module";
       database: process.env.DB_NAME,
       entities: [Accidente,EquipoIoT,Familiar,FotoTemporal,NotificacionEmergencia,Usuario,VehiculoCercano,Seguro,Policia], // Entidades que utilizarás
       synchronize: true,
-      dropSchema:true,
+      dropSchema:false,
       options: {
         encrypt: false,
       },

@@ -1,3 +1,5 @@
+import * as process from "node:process";
+
 export default () => ({
   port: parseInt(process.env.PORT, 10) || 3000,
   database: {
@@ -6,5 +8,9 @@ export default () => ({
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-  }
+  },
+  api_key:process.env.APIKEYOPENAI,
+  CLOUDINARY_CLOUD_NAME:process.env.CLOUDINARY_CLOUD_NAME,
+  CLOUDINARY_API_KEY:process.env.CLOUDINARY_API_KEY,
+  CLOUDINARY_API_SECRET:process.env.CLOUDINARY_API_SECRET
 });

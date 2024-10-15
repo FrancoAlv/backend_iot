@@ -14,6 +14,9 @@ export class CreateUserUseCase {
     if (existingUser) {
       throw new ConflictException('El usuario con este correo ya existe.');
     }
+    if (existingUser) {
+      throw new ConflictException('El usuario con este correo ya existe.');
+    }
 
     const usuario = new Usuario();
     usuario.nombre = createUserDto.nombre;

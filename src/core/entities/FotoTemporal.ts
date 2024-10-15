@@ -13,6 +13,9 @@ export class FotoTemporal {
   url_foto: string;
 
   @Column()
+  public_id: string;
+
+  @Column()
   fecha_hora_captura: Date;
 
   @Column()
