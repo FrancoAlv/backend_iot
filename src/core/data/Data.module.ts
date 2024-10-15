@@ -12,21 +12,26 @@ import { VehiculoCercano } from "../entities/VehiculoCercano";
 import { ServicesModule } from "../../services/services.module";
 import { FamiliarRepositoryImpl } from "./FamiliarRepositoryImpl";
 import { Familiar } from "../entities/Familiar";
+import { Policia } from "../entities/Policia";
+import { IPoliciaRepository } from "./IPoliciaRepository";
+import { PoliciaRepositoryImpl } from "./PoliciaRepositoryImpl";
 
 
 @Module({
-  imports:[RepositoryModule,ServicesModule,TypeOrmModule.forFeature([Usuario,EquipoIoT,Accidente,FotoTemporal,VehiculoCercano,Familiar])],
+  imports:[RepositoryModule,ServicesModule,TypeOrmModule.forFeature([Usuario,EquipoIoT,Accidente,FotoTemporal,VehiculoCercano,Familiar,Policia])],
   exports:[
     {provide :"IUsuarioRepository",useClass:UsuarioRepositoryImpl},
     {provide :"IAccidenteRepository",useClass:AccidenteRepositoryImpl},
     {provide :"IEquipoIoTRepository",useClass:EquipoIoTRepositoryImpl},
     {provide :"IFamiliarRepository",useClass:FamiliarRepositoryImpl},
+    {provide :"IPoliciaRepository",useClass:PoliciaRepositoryImpl},
   ],
   providers:[
     {provide:"IUsuarioRepository",useClass:UsuarioRepositoryImpl},
     {provide :"IAccidenteRepository",useClass:AccidenteRepositoryImpl},
     {provide :"IEquipoIoTRepository",useClass:EquipoIoTRepositoryImpl},
     {provide :"IFamiliarRepository",useClass:FamiliarRepositoryImpl},
+    {provide :"IPoliciaRepository",useClass:PoliciaRepositoryImpl},
   ]
 })
 export class DataModule {}
