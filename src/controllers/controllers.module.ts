@@ -6,6 +6,7 @@ import { AccidenteController } from "./AccidenteController";
 import { FamiliarController } from "./FamiliarController";
 import { PoliciaController } from "./PoliciaController";
 import { SeguroController } from "./SeguroController";
+import { ServicesModule } from "../services/services.module";
 
 
 @Module({

@@ -2,6 +2,7 @@ import { Controller, Post, Body, Param, Get, Patch, Delete } from "@nestjs/commo
 import { FamiliarDto } from '../core/dto/FamiliarDto';
 import { FamiliarUseCase } from "../core/useCases/FamiliarUseCase";
 import { Familiar } from "../core/entities/Familiar";
+import { WhatsAppService } from "../services/WhatsAppService";
 
 @Controller('usuario')
 export class FamiliarController {

@@ -10,6 +10,9 @@ export class UsuarioRepositoryImpl implements IUsuarioRepository {
   async findById(usuarioId:number): Promise<Usuario> {
     return await this.usuarioRepository.findById(usuarioId);
   }
+  async findByIdWithAll(usuarioId:number,accidente_id:number): Promise<Usuario> {
+    return await this.usuarioRepository.findByIdwithall(usuarioId,accidente_id);
+  }
 
   async create(usuario: Usuario): Promise<Usuario> {
     return await this.usuarioRepository.create(usuario);

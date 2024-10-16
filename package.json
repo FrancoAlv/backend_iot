@@ -30,9 +30,11 @@
     "cloudinary": "^2.5.1",
     "mssql": "^10.0.4",
     "mysql2": "^3.11.3",
+    "nodemailer": "^6.9.15",
     "openai": "^4.67.3",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
+    "twilio": "^5.3.3",
     "typeorm": "^0.3.20"
   },
   "devDependencies": {

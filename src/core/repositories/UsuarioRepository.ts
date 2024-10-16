@@ -29,4 +29,15 @@ export class UsuarioRepository {
      }
     });
   }
+  async findByIdwithall(usuarioId: number,accidente_id:number)  :Promise<Usuario | null>{
+    return await this.repository.findOne({
+      where:{
+        usuario_id: usuarioId,
+        accidentes:{
+          accidente_id:accidente_id
+        }
+      },
+      relations:["familiares","accidentes","policias","seguro","accidentes.vehiculosCercanos","accidentes.vehiculosCercanos.fotoTemporal"]
+    });
+  }
 }

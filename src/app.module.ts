@@ -14,6 +14,7 @@ import { Policia } from "./core/entities/Policia";
 import { ConfigModule } from "@nestjs/config";
 import configuration from "./config/configuration";
 import { ControllersModule } from "./controllers/controllers.module";
+import { GatewaysModule } from "./core/gateways/gateways.module";
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ControllersModule } from "./controllers/controllers.module";
       isGlobal: true,
       load: [configuration],
     }),
+    GatewaysModule,
     ControllersModule,
     TypeOrmModule.forRoot({
       type: 'mssql',

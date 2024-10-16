@@ -6,10 +6,12 @@ import { ServicesModule } from "../../services/services.module";
 import { FamiliarUseCase } from "./FamiliarUseCase";
 import { PoliciaUseCase } from "./PoliciaUseCase";
 import { SeguroUseCase } from "./SeguroUseCase";
+import { GatewaysModule } from "../gateways/gateways.module";
+import { Observers } from "../observers/observers.module";
 
 
 @Module({
-  imports: [DataModule,ServicesModule],
+  imports: [DataModule,ServicesModule,Observers],
   exports:[CreateUserUseCase,AccidenteUseCase,FamiliarUseCase,PoliciaUseCase,SeguroUseCase],
   providers: [CreateUserUseCase,AccidenteUseCase,FamiliarUseCase,PoliciaUseCase,SeguroUseCase]
 })

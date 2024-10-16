@@ -28,4 +28,8 @@ export class CreateUserUseCase {
 
     return await this.usuarioRepository.create(usuario);
   }
+
+
+
+
 }
