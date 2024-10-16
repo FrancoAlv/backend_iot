@@ -27,6 +27,7 @@ export class AccidenteUseCase {
 
   async notificarFamiliares(usuario_id: number,accidente_id:number) {
    const persona=  await this.usuarioRepository.findByIdWithAll(usuario_id,accidente_id);
+
    for (const familiar of persona.familiares){
      await this.whatsAppService.sendWhatsAppMessage(
        familiar.telefono,
@@ -37,6 +38,7 @@ export class AccidenteUseCase {
        )}`
      );
    }
+
    for (const policia of persona.policias){
       await this.whatsAppService.sendWhatsAppMessage(
         policia.telefono,
@@ -47,6 +49,7 @@ export class AccidenteUseCase {
         )}`
       );
     }
+
     if (persona?.seguro?.telefono){
       await this.whatsAppService.sendWhatsAppMessage(
         persona.seguro.telefono,

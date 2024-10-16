@@ -29,16 +29,17 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (state === 'accidente_detectado') {
         this.server.emit(`notificacionAccidente_${usuarioId}`, {
           mensaje: 'Se ha detectado un accidente, por favor confirme si desea enviar notificaciones automáticas.',
+          time_out: 2 * 60 * 1000,
+          accidente_id:accidente_id
         });
         const timeout = setTimeout(async () => {
-          accidenteUseCase.notificarFamiliares(usuarioId, accidente_id);
+          await accidenteUseCase.notificarFamiliares(usuarioId, accidente_id);
           this.server.emit(`notificacionAccidenteTimeout_${usuarioId}`, {
             mensaje: 'No se recibió respuesta del usuario. Enviando notificaciones automáticas.',
+            respuesta:false
           });
           this.pendingResponses.delete(usuarioId.toString());
         }, 2 * 60 * 1000);
-
-
         this.pendingResponses.set(usuarioId.toString(), timeout);
       }
     });
@@ -76,21 +77,17 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('respuestaUsuario')
-  async handleUsuarioResponse(@MessageBody() data: { usuarioId: string; respuesta: string }): Promise<void> {
+  async handleUsuarioResponse(@MessageBody() data: { usuarioId: number;accidente_id:number; respuesta: string }): Promise<void> {
     // Cancelar el temporizador si el usuario responde
-    const timeout = this.pendingResponses.get(data.usuarioId);
-    if (timeout) {
-      clearTimeout(timeout);
-      this.pendingResponses.delete(data.usuarioId);
-      this.logger.log(`Respuesta recibida del usuario ${data.usuarioId}: ${data.respuesta}`);
+    const timeout = this.pendingResponses.get(data.usuarioId.toString());
+    if (!timeout){
+      return;
     }
-
-    // Procesar la respuesta del usuario (ejemplo: enviar notificación manualmente)
+    clearTimeout(timeout);
+    this.pendingResponses.delete(data.usuarioId.toString());
+    this.logger.log(`Respuesta recibida del usuario ${data.usuarioId}: ${data.respuesta}`);
     if (data.respuesta.toLowerCase() === 'enviar') {
-      await this.whatsappService.sendWhatsAppMessage(
-        '+1234567890', // Número de teléfono de la autoridad (ejemplo)
-        'El usuario ha confirmado el envío de la notificación. Por favor, tomar las medidas necesarias.'
-      );
+      await this.accidenteUseCase.notificarFamiliares(data.usuarioId, data.accidente_id);
     }
   }
 }
