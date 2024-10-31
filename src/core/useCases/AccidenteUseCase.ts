@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { ConflictException, Inject, Injectable } from "@nestjs/common";
 import { CloudinaryService } from '../../services/CloudinaryService';
 import { OpenAIService } from '../../services/OpenAIService';
 import { AccidenteDto } from '../dto/AccidenteDto';
@@ -11,6 +11,7 @@ import { IFamiliarRepository } from "../data/IFamiliarRepository";
 import { NotificationStateObserver } from "../observers/NotificationStateObserver";
 import { IUsuarioRepository } from "../data/IUsuarioRepository";
 import { Usuario } from "../entities/Usuario";
+import { Accidente } from "../entities/Accidente";
 
 @Injectable()
 export class AccidenteUseCase {
@@ -92,4 +93,17 @@ export class AccidenteUseCase {
     }
     return { analysis: [fullAnalysis] };
   }
+
+  async findByUidandemailwithall(uid: string,email:string)  :Promise<Accidente[]>{
+    const  usuario= await this.usuarioRepository.findByUidandemailwithall(uid,email);
+    if (usuario){
+      return usuario.accidentes ?? [];
+    }
+
+    throw new ConflictException('No se encuentra usuario');
+
+  }
+
+
+
 }

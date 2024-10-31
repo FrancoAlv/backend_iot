@@ -14,10 +14,19 @@ export class Usuario {
   nombre: string;
 
   @Column()
+  apellido_firts: string;
+
+  @Column()
+  apellido_second: string;
+
+  @Column()
   correo: string;
 
   @Column()
   telefono: string;
+
+  @Column()
+  uid_codigo: string;
 
   @OneToOne(() => EquipoIoT, equipoIoT => equipoIoT.usuario, { cascade: true })
   @JoinColumn()

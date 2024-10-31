@@ -22,6 +22,13 @@ export class UsuarioRepositoryImpl implements IUsuarioRepository {
     return await this.usuarioRepository.findByEmail(correo);
   }
 
+  async findByEmailAndUID(correo: string,UID:string): Promise<Usuario | null> {
+    return await this.usuarioRepository.findByEmailAndUID(correo,UID);
+  }
+
+async  findByUidandemailwithall(uid: string,email:string)  :Promise<Usuario | null>{
+  return await this.usuarioRepository.findByUidandemailwithall(uid,email);
+}
   async findAll(): Promise<Usuario[]> {
     return await this.usuarioRepository.findAll();
   }

@@ -19,6 +19,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   private readonly logger = new Logger(AppGateway.name);
+
   private pendingResponses: Map<string, NodeJS.Timeout> = new Map();
 
   constructor(private readonly whatsappService: WhatsAppService,
@@ -30,7 +31,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server.emit(`notificacionAccidente_${usuarioId}`, {
           mensaje: 'Se ha detectado un accidente, por favor confirme si desea enviar notificaciones automáticas.',
           time_out: 2 * 60 * 1000,
-          accidente_id:accidente_id
+          accidente_id: accidente_id
         });
         const timeout = setTimeout(async () => {
           await accidenteUseCase.notificarFamiliares(usuarioId, accidente_id);

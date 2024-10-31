@@ -18,6 +18,10 @@ export class UsuarioRepository {
     return await this.repository.findOne({ where: { correo } });
   }
 
+  async findByEmailAndUID(correo: string,UID:string): Promise<Usuario | null> {
+    return await this.repository.findOne({ where: { correo,uid_codigo:UID } });
+  }
+
   async findAll(): Promise<Usuario[] | null> {
     return await this.repository.find();
   }
@@ -40,4 +44,16 @@ export class UsuarioRepository {
       relations:["familiares","accidentes","policias","seguro","accidentes.vehiculosCercanos","accidentes.vehiculosCercanos.fotoTemporal"]
     });
   }
+
+  async findByUidandemailwithall(uid: string,email:string)  :Promise<Usuario | null>{
+    return await this.repository.findOne({
+      where:{
+        correo:email,
+        uid_codigo:uid
+      },
+      relations:["accidentes","accidentes.vehiculosCercanos","accidentes.vehiculosCercanos.fotoTemporal"]
+    });
+  }
+
+
 }
