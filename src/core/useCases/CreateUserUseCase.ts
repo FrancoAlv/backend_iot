@@ -6,6 +6,7 @@ import { EquipoIoT } from "../entities/EquipoIoT";
 import { IUsuarioRepository } from "../data/IUsuarioRepository";
 import { EquipoIoTRepository } from "../data/EquipoIoTRepository";
 import { UsuarioUidDto } from "../dto/UsuarioUidDto";
+import { PutUserDto } from "../dto/PutUserDto";
 
 @Injectable()
 export class CreateUserUseCase {
@@ -40,13 +41,28 @@ export class CreateUserUseCase {
   }
 
 
-  async  findUserbycorreoandUI(usuarioUidDto:UsuarioUidDto){
+  async findUserbycorreoandUI(usuarioUidDto:UsuarioUidDto){
     const existingUser = await this.usuarioRepository.findByEmailAndUID(usuarioUidDto.correo,usuarioUidDto.uid_codigo);
     if (existingUser) {
       return existingUser;
     }
     throw new ConflictException('No se encontro el usuario');
 
+  }
+
+
+  async putUser(usuarioUidDto:PutUserDto){
+    const existingUser = await this.usuarioRepository.findByEmailAndUID(usuarioUidDto.correo,usuarioUidDto.uid_codigo);
+    if (!existingUser) {
+      throw new ConflictException('No se encontro el usuario');
+    }
+    existingUser.nombre=usuarioUidDto.nombre;
+    existingUser.apellido_second=usuarioUidDto.apellido_second;
+    existingUser.apellido_firts=usuarioUidDto.apellido_firts;
+    existingUser.telefono=usuarioUidDto.telefono;
+    existingUser.equipoIoT.numero_serie=usuarioUidDto.codigo_equipo_iot;
+    const newuser = await this.usuarioRepository.putUsuario(existingUser);
+    return newuser;
   }
 
 

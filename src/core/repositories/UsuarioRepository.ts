@@ -19,9 +19,11 @@ export class UsuarioRepository {
   }
 
   async findByEmailAndUID(correo: string,UID:string): Promise<Usuario | null> {
-    return await this.repository.findOne({ where: { correo,uid_codigo:UID } });
+    return await this.repository.findOne({ where: { correo,uid_codigo:UID },relations:["equipoIoT"] });
   }
-
+  async putUsuario(usuario: Usuario): Promise<Usuario>{
+    return  this.repository.save(usuario);
+  }
   async findAll(): Promise<Usuario[] | null> {
     return await this.repository.find();
   }

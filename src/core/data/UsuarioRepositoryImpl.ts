@@ -32,4 +32,8 @@ async  findByUidandemailwithall(uid: string,email:string)  :Promise<Usuario | nu
   async findAll(): Promise<Usuario[]> {
     return await this.usuarioRepository.findAll();
   }
+
+  putUsuario(usuario: Usuario): Promise<Usuario> {
+    return  this.usuarioRepository.putUsuario(usuario);
+  }
 }

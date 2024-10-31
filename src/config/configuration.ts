@@ -12,5 +12,6 @@ export default () => ({
   api_key:process.env.APIKEYOPENAI,
   CLOUDINARY_CLOUD_NAME:process.env.CLOUDINARY_CLOUD_NAME,
   CLOUDINARY_API_KEY:process.env.CLOUDINARY_API_KEY,
-  CLOUDINARY_API_SECRET:process.env.CLOUDINARY_API_SECRET
+  CLOUDINARY_API_SECRET:process.env.CLOUDINARY_API_SECRET,
+  google_key:process.env.google_key
 });

@@ -12,9 +12,16 @@ import { NotificationStateObserver } from "../observers/NotificationStateObserve
 import { IUsuarioRepository } from "../data/IUsuarioRepository";
 import { Usuario } from "../entities/Usuario";
 import { Accidente } from "../entities/Accidente";
+import { HttpService } from "@nestjs/axios";
+import { firstValueFrom } from "rxjs";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class AccidenteUseCase {
+
+  private  apiKey:string = '';
+
+
   constructor(
     private readonly cloudinaryService: CloudinaryService,
     private readonly openAIService: OpenAIService,
@@ -23,8 +30,12 @@ export class AccidenteUseCase {
     @Inject("IFamiliarRepository") private readonly familiarRepository: IFamiliarRepository,
     private readonly whatsAppService:WhatsAppService,
     private readonly notificationStateObserver:NotificationStateObserver,
-    @Inject("IUsuarioRepository") private readonly usuarioRepository: IUsuarioRepository
-  ) {}
+    @Inject("IUsuarioRepository") private readonly usuarioRepository: IUsuarioRepository,
+    private readonly httpService: HttpService,
+    configService: ConfigService
+  ) {
+    this.apiKey=configService.get("google_key");
+  }
 
   async notificarFamiliares(usuario_id: number,accidente_id:number) {
    const persona=  await this.usuarioRepository.findByIdWithAll(usuario_id,accidente_id);
@@ -96,12 +107,44 @@ export class AccidenteUseCase {
 
   async findByUidandemailwithall(uid: string,email:string)  :Promise<Accidente[]>{
     const  usuario= await this.usuarioRepository.findByUidandemailwithall(uid,email);
+
     if (usuario){
-      return usuario.accidentes ?? [];
+      return await Promise.all(  usuario.accidentes.map(async  value =>{
+        let cordinates= value.ubicacion_gps.split(",");
+        let streetname=  await this.getStreetName(parseFloat(cordinates[0].trim()),parseFloat(cordinates[1].trim()))
+        return {...value, streetname:streetname};
+      })) ?? [];
     }
 
     throw new ConflictException('No se encuentra usuario');
 
+  }
+
+  async getStreetName(latitude: number, longitude: number): Promise<string> {
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${this.apiKey}`;
+
+    try {
+      const response = await firstValueFrom(this.httpService.get(url));
+      const data = response.data;
+
+      if (data.status === 'OK' && data.results.length > 0) {
+
+        if (data.results.length > 0) {
+          const addressComponents = data.results[0].address_components;
+          // Filtra para obtener solo el `short_name` de `locality`
+          const localityComponent = addressComponents.find(component =>
+            component.types.includes('locality')
+          );
+          return localityComponent ? localityComponent.short_name : 'Unknown';
+        }
+        return 'Unknown';
+      } else {
+        return 'Dirección no encontrada';
+      }
+    } catch (error) {
+      console.error('Error al obtener dirección:', error.message);
+      return 'Error al obtener dirección';
+    }
   }
 
 
