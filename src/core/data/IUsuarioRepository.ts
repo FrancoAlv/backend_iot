@@ -8,6 +8,8 @@ export interface IUsuarioRepository {
   findByEmailAndUID(correo: string,UID:string): Promise<Usuario | null>;
   findAll(): Promise<Usuario[]>;
   findById(usuarioId:number): Promise<Usuario>;
+  findByUid(uid_codigo:string): Promise<Usuario| null>;
   findByIdWithAll(usuarioId:number,accidente_id:number): Promise<Usuario>;
+  findByUidWithAll(uid_codigo:string,accidente_id:number): Promise<Usuario>;
   findByUidandemailwithall(uid: string,email:string)  :Promise<Usuario | null>;
 }

@@ -11,6 +11,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { WhatsAppService } from "../../services/WhatsAppService";
 import { NotificationStateObserver } from "../observers/NotificationStateObserver";
 import { AccidenteUseCase } from "../useCases/AccidenteUseCase";
+import { FirebaseService } from "../../firebase/firebase.service";
 
 @WebSocketGateway({ cors: { origin: '*' }, })
 @Injectable()
@@ -24,26 +25,43 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(private readonly whatsappService: WhatsAppService,
               private readonly notificationStateObserver: NotificationStateObserver,
-              private readonly accidenteUseCase:AccidenteUseCase) {
+              private readonly accidenteUseCase:AccidenteUseCase,
+              private readonly firebaseService: FirebaseService,) {
+    this.handleNotification();
+  }
 
-    this.notificationStateObserver.notificationState$.subscribe(({ usuarioId,accidente_id, state }) => {
-      if (state === 'accidente_detectado') {
-        this.server.emit(`notificacionAccidente_${usuarioId}`, {
-          mensaje: 'Se ha detectado un accidente, por favor confirme si desea enviar notificaciones automáticas.',
-          time_out: 2 * 60 * 1000,
-          accidente_id: accidente_id
-        });
-        const timeout = setTimeout(async () => {
-          await accidenteUseCase.notificarFamiliares(usuarioId, accidente_id);
-          this.server.emit(`notificacionAccidenteTimeout_${usuarioId}`, {
-            mensaje: 'No se recibió respuesta del usuario. Enviando notificaciones automáticas.',
-            respuesta:false
-          });
-          this.pendingResponses.delete(usuarioId.toString());
-        }, 2 * 60 * 1000);
-        this.pendingResponses.set(usuarioId.toString(), timeout);
-      }
-    });
+  async handleNotification() {
+    this.notificationStateObserver.notificationState$.subscribe(
+      async ({ uid_codigo, usuarioId, accidente_id, state }) => {
+        if (state === 'accidente_detectado') {
+          // Enviar notificación de accidente
+          await this.firebaseService.sendNotification(
+            uid_codigo, // Token del dispositivo FCM del usuario
+            'Se ha detectado un accidente',
+            'Por favor confirme si desea enviar notificaciones automáticas.',
+            {
+              accidente_id: accidente_id.toString(),
+              mensaje:'Se ha detectado un accidente.\n Por favor confirme si desea enviar notificaciones automáticas.',
+              timeout: (2 * 60 * 1000).toString(), // En milisegundos como string
+            },
+          );
+
+          const timeout = setTimeout(async () => {
+            await this.accidenteUseCase.notificarFamiliares(uid_codigo, accidente_id);
+            await this.firebaseService.sendNotification(
+              uid_codigo, // Token FCM del usuario
+              'Notificación de Accidente Automática',
+              'No se recibió respuesta. Enviando notificaciones automáticas.',
+              { respuesta: 'false' },
+            );
+
+            this.pendingResponses.delete(uid_codigo.toString());
+          }, 2 * 60 * 1000); // Espera de 2 minutos para enviar la segunda notificación
+
+          this.pendingResponses.set(uid_codigo.toString(), timeout);
+        }
+      },
+    );
   }
 
   handleConnection(client: Socket) {
@@ -78,17 +96,19 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('respuestaUsuario')
-  async handleUsuarioResponse(@MessageBody() data: { usuarioId: number;accidente_id:number; respuesta: string }): Promise<void> {
+  async handleUsuarioResponse(@MessageBody() data: { uid_codigo: string;accidente_id:number; respuesta: string }): Promise<void> {
+    this.logger.log(`Respuesta recibida del usuario ${data.uid_codigo}: ${data.respuesta}`);
     // Cancelar el temporizador si el usuario responde
-    const timeout = this.pendingResponses.get(data.usuarioId.toString());
+    const timeout = this.pendingResponses.get(data.uid_codigo.toString());
     if (!timeout){
       return;
     }
     clearTimeout(timeout);
-    this.pendingResponses.delete(data.usuarioId.toString());
-    this.logger.log(`Respuesta recibida del usuario ${data.usuarioId}: ${data.respuesta}`);
+    this.pendingResponses.delete(data.uid_codigo.toString());
+    this.logger.log(`Respuesta recibida del usuario ${data.uid_codigo}: ${data.respuesta}`);
     if (data.respuesta.toLowerCase() === 'enviar') {
-      await this.accidenteUseCase.notificarFamiliares(data.usuarioId, data.accidente_id);
+      await this.accidenteUseCase.notificarFamiliares(data.uid_codigo, data.accidente_id);
     }
+
   }
 }

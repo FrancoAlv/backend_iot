@@ -8,4 +8,5 @@ export class PutUserDto {
   uid_codigo: string;
   apellido_firts:string;
   apellido_second:string;
+  token_messagin: string;
 }

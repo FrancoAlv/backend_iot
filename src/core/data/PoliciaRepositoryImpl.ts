@@ -22,8 +22,8 @@ export class PoliciaRepositoryImpl implements IPoliciaRepository {
     return await this.repository.find({ where: { usuario } });
   }
 
-  async findByIdAndUsuario(policiaId: number, usuarioId: number): Promise<Policia | null> {
-    return await this.repository.findOne({ where: { policia_id: policiaId, usuario: { usuario_id: usuarioId } } });
+  async findByIdAndUsuario(policiaId: number, uid_codigo: string): Promise<Policia | null> {
+    return await this.repository.findOne({ where: { policia_id: policiaId, usuario: { uid_codigo: uid_codigo } } });
   }
 
   async delete(policia: Policia): Promise<void> {

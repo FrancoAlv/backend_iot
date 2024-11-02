@@ -37,10 +37,10 @@ export class AccidenteUseCase {
     this.apiKey=configService.get("google_key");
   }
 
-  async notificarFamiliares(usuario_id: number,accidente_id:number) {
-   const persona=  await this.usuarioRepository.findByIdWithAll(usuario_id,accidente_id);
+  async notificarFamiliares(uid_codigo: string,accidente_id:number) {
+   const persona=  await this.usuarioRepository.findByUidWithAll(uid_codigo,accidente_id);
 
-   for (const familiar of persona.familiares){
+   for (const familiar of persona?.familiares){
      await this.whatsAppService.sendWhatsAppMessage(
        familiar.telefono,
        `El usuario ${persona.nombre} ah sufrido un accidente en la posicion  ${persona.accidentes?.map(accidente =>
@@ -51,7 +51,7 @@ export class AccidenteUseCase {
      );
    }
 
-   for (const policia of persona.policias){
+   for (const policia of persona?.policias){
       await this.whatsAppService.sendWhatsAppMessage(
         policia.telefono,
         `El usuario ${persona.nombre} ah sufrido un accidente en la posicion  ${persona?.accidentes.map(accidente =>
@@ -100,7 +100,7 @@ export class AccidenteUseCase {
     // Save accident information
     const accidente= await this.accidenteRepository.savewithVehiculoCercano(usuario, fullAnalysis,url.secure_url,url.name);
     if (fullAnalysis.accidentDetected){
-      this.notificationStateObserver.notify(usuario.usuario_id,accidente.accidente_id, 'accidente_detectado');
+      this.notificationStateObserver.notify(usuario.token_messagin,usuario.usuario_id,accidente.accidente_id, 'accidente_detectado');
     }
     return { analysis: [fullAnalysis] };
   }

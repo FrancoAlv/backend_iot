@@ -2,7 +2,8 @@
 /dist
 /node_modules
 /build
-
+/serviceAccountKey.json
+serviceAccountKey.json
 # Logs
 logs
 *.log

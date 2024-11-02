@@ -35,10 +35,31 @@ export class UsuarioRepository {
      }
     });
   }
+
+  async findByUid(uid_codigo: string)  :Promise<Usuario | null>{
+    return await this.repository.findOne({
+      where:{
+        uid_codigo: uid_codigo,
+      }
+    });
+  }
+
   async findByIdwithall(usuarioId: number,accidente_id:number)  :Promise<Usuario | null>{
     return await this.repository.findOne({
       where:{
         usuario_id: usuarioId,
+        accidentes:{
+          accidente_id:accidente_id
+        }
+      },
+      relations:["familiares","accidentes","policias","seguro","accidentes.vehiculosCercanos","accidentes.vehiculosCercanos.fotoTemporal"]
+    });
+  }
+
+  async findByUidWithAll(uid_codigo: string,accidente_id:number)  :Promise<Usuario | null>{
+    return await this.repository.findOne({
+      where:{
+        uid_codigo: uid_codigo,
         accidentes:{
           accidente_id:accidente_id
         }

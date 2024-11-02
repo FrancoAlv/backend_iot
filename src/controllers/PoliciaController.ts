@@ -1,31 +1,32 @@
 import { Controller, Post, Body, Param, Get, Patch, Delete } from '@nestjs/common';
 import { PoliciaDto } from '../core/dto/PoliciaDto';
 import { PoliciaUseCase } from "../core/useCases/PoliciaUseCase";
+import { Policia } from "../core/entities/Policia";
 
 @Controller('usuario')
 export class PoliciaController {
   constructor(private readonly policiaUseCase: PoliciaUseCase) {}
 
-  @Post(':usuarioId/policia/agregar')
-  async agregarPolicia(@Param('usuarioId') usuarioId: number, @Body() policiaDto: PoliciaDto): Promise<{ message: string }> {
-    await this.policiaUseCase.add(usuarioId, policiaDto);
+  @Post(':uid_codigo/policia/agregar')
+  async agregarPolicia(@Param('uid_codigo') uid_codigo: string, @Body() policiaDto: PoliciaDto): Promise<{ message: string }> {
+    await this.policiaUseCase.add(uid_codigo, policiaDto);
     return { message: 'Policía agregado exitosamente' };
   }
 
-  @Get(':usuarioId/policia')
-  async obtenerPolicias(@Param('usuarioId') usuarioId: number): Promise<PoliciaDto[]> {
-    return await this.policiaUseCase.getAll(usuarioId);
+  @Get(':uid_codigo/policia')
+  async obtenerPolicias(@Param('uid_codigo') uid_codigo: string): Promise<Policia[]> {
+    return await this.policiaUseCase.getAll(uid_codigo);
   }
 
-  @Patch(':usuarioId/policia/:policiaId')
-  async actualizarPolicia(@Param('usuarioId') usuarioId: number, @Param('policiaId') policiaId: number, @Body() policiaDto: PoliciaDto): Promise<{ message: string }> {
-    await this.policiaUseCase.update(usuarioId, policiaId, policiaDto);
+  @Patch(':uid_codigo/policia/:policiaId')
+  async actualizarPolicia(@Param('uid_codigo') uid_codigo: string, @Param('policiaId') policiaId: number, @Body() policiaDto: PoliciaDto): Promise<{ message: string }> {
+    await this.policiaUseCase.update(uid_codigo, policiaId, policiaDto);
     return { message: 'Policía actualizado exitosamente' };
   }
 
-  @Delete(':usuarioId/policia/:policiaId')
-  async eliminarPolicia(@Param('usuarioId') usuarioId: number, @Param('policiaId') policiaId: number): Promise<{ message: string }> {
-    await this.policiaUseCase.delete(usuarioId, policiaId);
+  @Delete(':uid_codigo/policia/:policiaId')
+  async eliminarPolicia(@Param('uid_codigo') uid_codigo: string, @Param('policiaId') policiaId: number): Promise<{ message: string }> {
+    await this.policiaUseCase.delete(uid_codigo, policiaId);
     return { message: 'Policía eliminado exitosamente' };
   }
 }

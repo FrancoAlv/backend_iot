@@ -61,6 +61,7 @@ export class CreateUserUseCase {
     existingUser.apellido_firts=usuarioUidDto.apellido_firts;
     existingUser.telefono=usuarioUidDto.telefono;
     existingUser.equipoIoT.numero_serie=usuarioUidDto.codigo_equipo_iot;
+    existingUser.token_messagin=usuarioUidDto.token_messagin;
     const newuser = await this.usuarioRepository.putUsuario(existingUser);
     return newuser;
   }

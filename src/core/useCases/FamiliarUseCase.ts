@@ -27,7 +27,7 @@ export class FamiliarUseCase {
     return  await this.familiarRepository.save(familiar);
   }
 
-  async getAll(usuarioId: number): Promise<FamiliarDto[]> {
+  async getAll(usuarioId: number): Promise<Familiar[]> {
     const usuario = await this.usuarioRepository.findById(usuarioId);
     if (!usuario) {
       throw new Error('Usuario no encontrado');

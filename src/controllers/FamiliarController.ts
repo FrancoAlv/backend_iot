@@ -15,7 +15,7 @@ export class FamiliarController {
   }
 
   @Get(':usuarioId/familiar')
-  async obtenerFamiliares(@Param('usuarioId') usuarioId: number): Promise<FamiliarDto[]> {
+  async obtenerFamiliares(@Param('usuarioId') usuarioId: number): Promise<Familiar[]> {
     return await this.familiarUseCase.getAll(usuarioId);
   }
 

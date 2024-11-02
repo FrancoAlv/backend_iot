@@ -19,6 +19,9 @@ export class Usuario {
   @Column()
   apellido_second: string;
 
+  @Column( { nullable: true })
+  token_messagin: string;
+
   @Column()
   correo: string;
 
