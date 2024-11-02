@@ -3,6 +3,7 @@ import { SeguroDto } from '../dto/SeguroDto';
 import { Seguro } from '../entities/Seguro';
 import { ISeguroRepository } from "../data/ISeguroRepository";
 import { IUsuarioRepository } from "../data/IUsuarioRepository";
+import { NotFoundException } from "@nestjs/common/exceptions/not-found.exception";
 
 @Injectable()
 export class SeguroUseCase {
@@ -14,7 +15,7 @@ export class SeguroUseCase {
   async add(usuarioId: number, seguroDto: SeguroDto): Promise<void> {
     const usuario = await this.usuarioRepository.findById(usuarioId);
     if (!usuario) {
-      throw new Error('Usuario no encontrado');
+      throw new NotFoundException('Usuario no encontrado');
     }
 
     const seguro = new Seguro();
@@ -28,7 +29,7 @@ export class SeguroUseCase {
   async getAll(usuarioId: number): Promise<SeguroDto[]> {
     const usuario = await this.usuarioRepository.findById(usuarioId);
     if (!usuario) {
-      throw new Error('Usuario no encontrado');
+      throw new NotFoundException('Usuario no encontrado');
     }
 
     return await this.seguroRepository.findAllByUsuario(usuario);
@@ -37,7 +38,7 @@ export class SeguroUseCase {
   async update(usuarioId: number, seguroId: number, seguroDto: SeguroDto): Promise<void> {
     const seguro = await this.seguroRepository.findByIdAndUsuario(seguroId, usuarioId);
     if (!seguro) {
-      throw new Error('Seguro no encontrado');
+      throw new NotFoundException('Seguro no encontrado');
     }
 
     seguro.nombre = seguroDto.nombre;
@@ -50,7 +51,7 @@ export class SeguroUseCase {
   async delete(usuarioId: number, seguroId: number): Promise<void> {
     const seguro = await this.seguroRepository.findByIdAndUsuario(seguroId, usuarioId);
     if (!seguro) {
-      throw new Error('Seguro no encontrado');
+      throw new NotFoundException('Seguro no encontrado');
     }
 
     await this.seguroRepository.delete(seguro);

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, Get, Patch, Delete } from "@nestjs/common";
+import { Controller, Post, Body, Param, Get, Patch, Delete, Put } from "@nestjs/common";
 import { FamiliarDto } from '../core/dto/FamiliarDto';
 import { FamiliarUseCase } from "../core/useCases/FamiliarUseCase";
 import { Familiar } from "../core/entities/Familiar";
@@ -8,26 +8,26 @@ import { WhatsAppService } from "../services/WhatsAppService";
 export class FamiliarController {
   constructor(private readonly familiarUseCase: FamiliarUseCase) {}
 
-  @Post(':usuarioId/familiar/agregar')
-  async agregarFamiliar(@Param('usuarioId') usuarioId: number, @Body() familiarDto: FamiliarDto): Promise<{ message: string;familiar:Familiar }> {
-    const data= await this.familiarUseCase.execute(usuarioId, familiarDto);
+  @Post(':uid_codigo/familiar/agregar')
+  async agregarFamiliar(@Param('uid_codigo') uid_codigo: string, @Body() familiarDto: FamiliarDto): Promise<{ message: string;familiar:Familiar }> {
+    const data= await this.familiarUseCase.execute(uid_codigo, familiarDto);
     return { message: 'Familiar agregado exitosamente' ,familiar:data };
   }
 
-  @Get(':usuarioId/familiar')
-  async obtenerFamiliares(@Param('usuarioId') usuarioId: number): Promise<Familiar[]> {
-    return await this.familiarUseCase.getAll(usuarioId);
+  @Get(':uid_codigo/familiar')
+  async obtenerFamiliares(@Param('uid_codigo') uid_codigo: string): Promise<Familiar[]> {
+    return await this.familiarUseCase.getAll(uid_codigo);
   }
 
-  @Patch(':usuarioId/familiar/:familiarId')
-  async actualizarFamiliar(@Param('usuarioId') usuarioId: number, @Param('familiarId') familiarId: number, @Body() familiarDto: FamiliarDto): Promise<{ message: string }> {
-    await this.familiarUseCase.update(usuarioId, familiarId, familiarDto);
+  @Put(':uid_codigo/familiar/:familiarId')
+  async actualizarFamiliar(@Param('uid_codigo') uid_codigo: string, @Param('familiarId') familiarId: number, @Body() familiarDto: FamiliarDto): Promise<{ message: string }> {
+    await this.familiarUseCase.update(uid_codigo, familiarId, familiarDto);
     return { message: 'Familiar actualizado exitosamente' };
   }
 
-  @Delete(':usuarioId/familiar/:familiarId')
-  async eliminarFamiliar(@Param('usuarioId') usuarioId: number, @Param('familiarId') familiarId: number): Promise<{ message: string }> {
-    await this.familiarUseCase.delete(usuarioId, familiarId);
+  @Delete(':uid_codigo/familiar/:familiarId')
+  async eliminarFamiliar(@Param('uid_codigo') uid_codigo: string, @Param('familiarId') familiarId: number): Promise<{ message: string }> {
+    await this.familiarUseCase.delete(uid_codigo, familiarId);
     return { message: 'Familiar eliminado exitosamente' };
   }
 }

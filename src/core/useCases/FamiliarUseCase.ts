@@ -3,6 +3,7 @@ import { FamiliarDto } from '../dto/FamiliarDto';
 import { Familiar } from '../entities/Familiar';
 import { IFamiliarRepository } from "../data/IFamiliarRepository";
 import { IUsuarioRepository } from "../data/IUsuarioRepository";
+import { NotFoundException } from "@nestjs/common/exceptions/not-found.exception";
 
 @Injectable()
 export class FamiliarUseCase {
@@ -11,10 +12,10 @@ export class FamiliarUseCase {
     @Inject("IUsuarioRepository") private readonly usuarioRepository: IUsuarioRepository,
   ) {}
 
-  async execute(usuarioId: number, familiarDto: FamiliarDto): Promise<Familiar> {
-    const usuario = await this.usuarioRepository.findById(usuarioId);
+  async execute(uid_codigo: string, familiarDto: FamiliarDto): Promise<Familiar> {
+    const usuario = await this.usuarioRepository.findByUid(uid_codigo);
     if (!usuario) {
-      throw new Error('Usuario no encontrado');
+      throw new NotFoundException('Usuario no encontrado');
     }
 
     const familiar = new Familiar();
@@ -27,19 +28,19 @@ export class FamiliarUseCase {
     return  await this.familiarRepository.save(familiar);
   }
 
-  async getAll(usuarioId: number): Promise<Familiar[]> {
-    const usuario = await this.usuarioRepository.findById(usuarioId);
+  async getAll(uid_codigo: string): Promise<Familiar[]> {
+    const usuario = await this.usuarioRepository.findByUid(uid_codigo);
     if (!usuario) {
-      throw new Error('Usuario no encontrado');
+      throw new NotFoundException('Usuario no encontrado');
     }
 
     return await this.familiarRepository.findAllByUsuario(usuario);
   }
 
-  async update(usuarioId: number, familiarId: number, familiarDto: FamiliarDto): Promise<void> {
-    const familiar = await this.familiarRepository.findByIdAndUsuario(familiarId, usuarioId);
+  async update(uid_codigo: string, familiarId: number, familiarDto: FamiliarDto): Promise<void> {
+    const familiar = await this.familiarRepository.findByIdAndUsuario(familiarId, uid_codigo);
     if (!familiar) {
-      throw new Error('Familiar no encontrado');
+      throw new NotFoundException('Familiar no encontrado');
     }
 
     familiar.nombre = familiarDto.nombre;
@@ -50,10 +51,10 @@ export class FamiliarUseCase {
     await this.familiarRepository.save(familiar);
   }
 
-  async delete(usuarioId: number, familiarId: number): Promise<void> {
-    const familiar = await this.familiarRepository.findByIdAndUsuario(familiarId, usuarioId);
+  async delete(uid_codigo: string, familiarId: number): Promise<void> {
+    const familiar = await this.familiarRepository.findByIdAndUsuario(familiarId, uid_codigo);
     if (!familiar) {
-      throw new Error('Familiar no encontrado');
+      throw new NotFoundException('Familiar no encontrado');
     }
 
     await this.familiarRepository.delete(familiar);

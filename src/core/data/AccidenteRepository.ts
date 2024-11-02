@@ -5,5 +5,5 @@ import { Accidente } from "../entities/Accidente";
 export abstract class AccidenteRepository {
   abstract save(usuario: Usuario, analysis: OpenAIAnalysisResult): Promise<void>;
 
-  abstract savewithVehiculoCercano(usuario: Usuario, analysis: OpenAIAnalysisResult,url:string,publicid:string): Promise<Accidente>;
+  abstract savewithVehiculoCercano(usuario: Usuario, analysis: OpenAIAnalysisResult,streetname:string,url:string,publicid:string): Promise<Accidente>;
 }

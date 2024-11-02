@@ -22,8 +22,8 @@ export class FamiliarRepositoryImpl implements IFamiliarRepository {
     return await this.repository.find({ where: { usuario } });
   }
 
-  async findByIdAndUsuario(familiarId: number, usuarioId: number): Promise<Familiar | null> {
-    return await this.repository.findOne({ where: { familiar_id: familiarId, usuario: { usuario_id: usuarioId } } });
+  async findByIdAndUsuario(familiarId: number, uid_codigo: string): Promise<Familiar | null> {
+    return await this.repository.findOne({ where: { familiar_id: familiarId, usuario: { uid_codigo: uid_codigo } } });
   }
 
   async delete(familiar: Familiar): Promise<void> {

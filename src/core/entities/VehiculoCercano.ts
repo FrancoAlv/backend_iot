@@ -16,6 +16,9 @@ export class VehiculoCercano {
   @Column()
   ubicacion_gps: string;
 
+  @Column({nullable: true})
+  streetname: string;
+
   @Column()
   fecha_hora_acercamiento: Date;
 

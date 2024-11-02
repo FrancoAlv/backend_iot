@@ -32,11 +32,11 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async handleNotification() {
     this.notificationStateObserver.notificationState$.subscribe(
-      async ({ uid_codigo, usuarioId, accidente_id, state }) => {
+      async ({ uid_codigo, token_menssajin, accidente_id, state }) => {
         if (state === 'accidente_detectado') {
           // Enviar notificación de accidente
           await this.firebaseService.sendNotification(
-            uid_codigo, // Token del dispositivo FCM del usuario
+            token_menssajin, // Token del dispositivo FCM del usuario
             'Se ha detectado un accidente',
             'Por favor confirme si desea enviar notificaciones automáticas.',
             {
@@ -49,7 +49,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
           const timeout = setTimeout(async () => {
             await this.accidenteUseCase.notificarFamiliares(uid_codigo, accidente_id);
             await this.firebaseService.sendNotification(
-              uid_codigo, // Token FCM del usuario
+              token_menssajin, // Token FCM del usuario
               'Notificación de Accidente Automática',
               'No se recibió respuesta. Enviando notificaciones automáticas.',
               { respuesta: 'false' },
@@ -57,7 +57,9 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
             this.pendingResponses.delete(uid_codigo.toString());
           }, 2 * 60 * 1000); // Espera de 2 minutos para enviar la segunda notificación
-
+          this.logger.log("accidente_detectado");
+          this.logger.log(timeout);
+          this.logger.log(uid_codigo.toString());
           this.pendingResponses.set(uid_codigo.toString(), timeout);
         }
       },
@@ -97,15 +99,16 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('respuestaUsuario')
   async handleUsuarioResponse(@MessageBody() data: { uid_codigo: string;accidente_id:number; respuesta: string }): Promise<void> {
-    this.logger.log(`Respuesta recibida del usuario ${data.uid_codigo}: ${data.respuesta}`);
+
     // Cancelar el temporizador si el usuario responde
     const timeout = this.pendingResponses.get(data.uid_codigo.toString());
+    this.logger.log(`Respuesta recibida del usuario ${data.uid_codigo}: ${data.respuesta} ${timeout}`);
     if (!timeout){
       return;
     }
     clearTimeout(timeout);
     this.pendingResponses.delete(data.uid_codigo.toString());
-    this.logger.log(`Respuesta recibida del usuario ${data.uid_codigo}: ${data.respuesta}`);
+    this.logger.log(`Respuesta recibida del usuario ${data.uid_codigo} : ${data.respuesta}  ${data.respuesta.toLowerCase() === 'enviar'}`);
     if (data.respuesta.toLowerCase() === 'enviar') {
       await this.accidenteUseCase.notificarFamiliares(data.uid_codigo, data.accidente_id);
     }

@@ -28,7 +28,7 @@ export class AccidenteRepositoryImpl implements AccidenteRepository {
     await this.repository.save(accidente);
   }
 
-  async savewithVehiculoCercano(usuario: Usuario, analysis: OpenAIAnalysisResult,url:string,publicid:string): Promise<Accidente> {
+  async savewithVehiculoCercano(usuario: Usuario, analysis: OpenAIAnalysisResult,streetname:string,url:string,publicid:string): Promise<Accidente> {
     const accidente = new Accidente();
     accidente.usuario = usuario;
     accidente.fecha_hora = new Date(Date.now());
@@ -38,6 +38,7 @@ export class AccidenteRepositoryImpl implements AccidenteRepository {
     accidente.vehiculosCercanos=[];
     let vehiculoCercanos=new VehiculoCercano();
     vehiculoCercanos.ubicacion_gps = analysis.gpsLocation;
+    vehiculoCercanos.streetname=streetname;
     vehiculoCercanos.fecha_hora_acercamiento=new Date(Date.now());
     vehiculoCercanos.placa=analysis.licensePlate
     vehiculoCercanos.fotoTemporal=new FotoTemporal();
