@@ -3,4 +3,5 @@ export class FamiliarDto {
   relacion: string;
   telefono: string;
   correo?: string;
+  isActive: boolean;
 }

@@ -7,6 +7,7 @@ import { FirebaseModule } from "../../firebase/firebase.module";
 
 @Module({
   imports: [ServicesModule,Observers,UsecasesModule,FirebaseModule],
-  providers: [AppGateway]
+  providers: [AppGateway],
+  exports:[AppGateway],
 })
 export class GatewaysModule {}

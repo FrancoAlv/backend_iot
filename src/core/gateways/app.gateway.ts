@@ -16,8 +16,8 @@ import { FirebaseService } from "../../firebase/firebase.service";
 @WebSocketGateway({ cors: { origin: '*' }, })
 @Injectable()
 export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  @WebSocketServer()
-  server: Server;
+    @WebSocketServer()
+    server: Server;
 
   private readonly logger = new Logger(AppGateway.name);
 

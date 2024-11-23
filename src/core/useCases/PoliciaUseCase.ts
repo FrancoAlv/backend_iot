@@ -47,7 +47,7 @@ export class PoliciaUseCase {
     // Guardar cada comisaría en la base de datos
     for (const place of places) {
       const existplace= await this.policiaRepository.findByplaceId(usuario,place.place_id)
-      this.logger.log(existplace)
+      //this.logger.log(existplace)
       if (!!existplace){
         continue;
       }

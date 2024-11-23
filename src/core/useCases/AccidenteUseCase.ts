@@ -47,10 +47,10 @@ export class AccidenteUseCase {
       return;
     }
 
-    const mensajeBase = `,lamentamos informarle que ha ocurrido un accidente a ${persona.nombre} ${persona.apellido_firts} ${persona.apellido_second}. A continuación, se detalla la información disponible:`;
+    const mensajeBase = `, lamentamos informarle que ha ocurrido un accidente a ${persona.nombre} ${persona.apellido_firts} ${persona.apellido_second}. A continuación, se detalla la información disponible:`;
 
     const detallesAccidente = persona.accidentes?.map(accidente => {
-      const ubicacionLink = `Ubicación: [Ver en Google Maps](https://www.google.com/maps/search/?api=1&query=${accidente.ubicacion_gps.replace(" ","")})`;
+      const ubicacionLink = `Ubicación: [Ver en Google Maps](https://www.google.com/maps/search/?api=1&query=${accidente.ubicacion_gps.replace(" ", "")})`;
       const detallesVehiculos = accidente.vehiculosCercanos?.map(vehiculo =>
         `- Placa: ${vehiculo.placa}\n  - Foto de evidencia: ${vehiculo.fotoTemporal?.url_foto}`
       ).join('\n');
@@ -60,21 +60,46 @@ export class AccidenteUseCase {
 
     const mensajeCompleto = `${mensajeBase}\n\n${detallesAccidente}`;
     this.logger.error(mensajeCompleto);
+
     // Notificar a los familiares
     for (const familiar of persona.familiares || []) {
       this.logger.log(`Notificación de emergencia para familiar:\n\n Estimado(a) ${familiar.nombre}${mensajeCompleto}`);
-      await this.whatsAppService.sendWhatsAppMessage(
-        familiar.telefono,
-        `Notificación de emergencia para familiar:\n\n Estimado(a) ${familiar.nombre}${mensajeCompleto}`
-      );
+      if (familiar.isActive) {
+        await this.whatsAppService.sendWhatsAppMessage(
+          familiar.telefono,
+          `Notificación de emergencia para familiar:\n\n Estimado(a) ${familiar.nombre}${mensajeCompleto}`
+        );
+      }
     }
 
-    // Notificar a la policía
-    for (const policia of persona.policias || []) {
-      await this.whatsAppService.sendWhatsAppMessage(
-        policia.telefono,
-        `Notificación de emergencia para personal policial:\n\nEstimado(a) ${policia.nombre}${mensajeCompleto}`
-      );
+    // Ordenar policías por proximidad y seleccionar los dos más cercanos
+    if (persona.policias && persona.accidentes?.[0]?.ubicacion_gps) {
+      const ubicacionAccidente = persona.accidentes[0].ubicacion_gps.split(',').map(coord => parseFloat(coord.replace(" ", "").trim()));
+      const policiasConDistancia = persona.policias
+        .filter(policia => policia.gps) // Asegurarse de que el policía tiene ubicación GPS
+        .map(policia => {
+          const ubicacionPolicia = policia.gps.split(',').map(coord => parseFloat(coord.replace(" ", "").trim()));
+          const distancia = Math.sqrt(
+            Math.pow(ubicacionAccidente[0] - ubicacionPolicia[0], 2) +
+            Math.pow(ubicacionAccidente[1] - ubicacionPolicia[1], 2)
+          );
+          return { ...policia, distancia };
+        });
+
+      // Ordenar policías por distancia
+      const policiasCercanos = policiasConDistancia
+        .sort((a, b) => a.distancia - b.distancia)
+        .slice(0, 2); // Seleccionar solo los dos más cercanos
+
+      // Notificar a los policías más cercanos
+      for (const policia of policiasCercanos) {
+        if (policia.isActive) {
+          await this.whatsAppService.sendWhatsAppMessage(
+            policia.telefono,
+            `Notificación de emergencia para personal policial:\n\nEstimado(a) ${policia.nombre}${mensajeCompleto}`
+          );
+        }
+      }
     }
 
     // Notificar a la aseguradora
@@ -87,6 +112,7 @@ export class AccidenteUseCase {
 
     this.logger.log("Notificaciones enviadas correctamente a los contactos asociados.");
   }
+
 
 
 

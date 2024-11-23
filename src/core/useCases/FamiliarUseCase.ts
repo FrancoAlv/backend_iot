@@ -23,6 +23,7 @@ export class FamiliarUseCase {
     familiar.nombre = familiarDto.nombre;
     familiar.relacion = familiarDto.relacion;
     familiar.telefono = familiarDto.telefono;
+    familiar.isActive = familiarDto.isActive;
     familiar.correo = familiarDto.correo;
 
     return  await this.familiarRepository.save(familiar);
@@ -46,6 +47,7 @@ export class FamiliarUseCase {
     familiar.nombre = familiarDto.nombre;
     familiar.relacion = familiarDto.relacion;
     familiar.telefono = familiarDto.telefono;
+    familiar.isActive = familiarDto.isActive;
     familiar.correo = familiarDto.correo;
 
     await this.familiarRepository.save(familiar);
