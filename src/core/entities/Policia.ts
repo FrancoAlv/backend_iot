@@ -11,11 +11,20 @@ export class Policia {
   @Column()
   nombre: string;
 
-  @Column()
+  @Column({nullable: true})
   telefono: string;
 
-  @Column()
+  @Column({nullable: true})
   correo: string;
+
+  @Column({nullable: true,unique: true})
+  place_id: string;
+
+  @Column({nullable: true})
+  gps: string;
+
+  @Column({nullable: true})
+  isActive: boolean;
 
   @ManyToOne(() => Usuario, usuario => usuario.policias)
   usuario: Usuario;

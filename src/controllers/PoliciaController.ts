@@ -2,6 +2,7 @@ import { Controller, Post, Body, Param, Get, Patch, Delete } from '@nestjs/commo
 import { PoliciaDto } from '../core/dto/PoliciaDto';
 import { PoliciaUseCase } from "../core/useCases/PoliciaUseCase";
 import { Policia } from "../core/entities/Policia";
+import { PoliciaCercanaDto } from "../core/dto/PoliciaCercanaDto";
 
 @Controller('usuario')
 export class PoliciaController {
@@ -16,6 +17,19 @@ export class PoliciaController {
   @Get(':uid_codigo/policia')
   async obtenerPolicias(@Param('uid_codigo') uid_codigo: string): Promise<Policia[]> {
     return await this.policiaUseCase.getAll(uid_codigo);
+  }
+  @Post(':uid_codigo/policia/buscar-cercanos')
+  async buscarPoliciasCercanos(
+    @Param('uid_codigo') uid_codigo: string,
+    @Body() policiaCercanaDto: PoliciaCercanaDto
+  ): Promise<{ message: string }> {
+    await this.policiaUseCase.findNearbyPolicias(
+      uid_codigo,
+      policiaCercanaDto.lat,
+      policiaCercanaDto.lng,
+      policiaCercanaDto.radius
+    );
+    return { message: 'Policías cercanos registrados exitosamente' };
   }
 
   @Patch(':uid_codigo/policia/:policiaId')

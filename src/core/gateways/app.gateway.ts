@@ -32,19 +32,42 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async handleNotification() {
     this.notificationStateObserver.notificationState$.subscribe(
-      async ({ uid_codigo, token_menssajin, accidente_id, state }) => {
+      async ({ uid_codigo, token_menssajin,secure_url, accidente_id, state }) => {
         if (state === 'accidente_detectado') {
           // Enviar notificación de accidente
           await this.firebaseService.sendNotification(
             token_menssajin, // Token del dispositivo FCM del usuario
             'Se ha detectado un accidente',
             'Por favor confirme si desea enviar notificaciones automáticas.',
+            secure_url,
             {
               accidente_id: accidente_id.toString(),
               mensaje:'Se ha detectado un accidente.\n Por favor confirme si desea enviar notificaciones automáticas.',
               timeout: (2 * 60 * 1000).toString(), // En milisegundos como string
             },
           );
+          let tiempoRestante =  2 * 60 ;
+          const intervalId = setInterval(async () => {
+            if (tiempoRestante <= 0) {
+              clearInterval(intervalId);
+              this.logger.log("Tiempo agotado. Notificaciones enviadas automáticamente a los contactos asociados.");
+              this.server.emit(`tiempoRestante_finish_${uid_codigo}`, {
+                accidente_id:accidente_id,
+              });
+            } else {
+              this.logger.log(`Todo enviado normal ${tiempoRestante}`);
+              // Emitir el tiempo restante a través del socket
+              this.server.emit(`tiempoRestante_${uid_codigo}`, {
+                tiempoRestante,
+                accidente_id:accidente_id,
+
+              });
+
+              // Disminuir el tiempo restante en 1 segundo
+              tiempoRestante -= 1;
+            }
+          }, 1000);
+
 
           const timeout = setTimeout(async () => {
             await this.accidenteUseCase.notificarFamiliares(uid_codigo, accidente_id);
@@ -52,14 +75,13 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
               token_menssajin, // Token FCM del usuario
               'Notificación de Accidente Automática',
               'No se recibió respuesta. Enviando notificaciones automáticas.',
+              secure_url,
               { respuesta: 'false' },
             );
 
             this.pendingResponses.delete(uid_codigo.toString());
           }, 2 * 60 * 1000); // Espera de 2 minutos para enviar la segunda notificación
-          this.logger.log("accidente_detectado");
-          this.logger.log(timeout);
-          this.logger.log(uid_codigo.toString());
+
           this.pendingResponses.set(uid_codigo.toString(), timeout);
         }
       },

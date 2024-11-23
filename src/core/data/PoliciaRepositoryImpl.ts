@@ -10,8 +10,10 @@ export class PoliciaRepositoryImpl implements IPoliciaRepository {
   constructor(
     @InjectRepository(Policia)
     private readonly repository: Repository<Policia>,
-  ) {
+  ) {}
 
+  findByplaceId(usuario: Usuario,place_id: string): Promise<Policia | null> {
+    return this.repository.findOne({ where: { place_id:place_id,usuario } });
   }
 
   async save(policia: Policia): Promise<void> {
@@ -22,8 +24,13 @@ export class PoliciaRepositoryImpl implements IPoliciaRepository {
     return await this.repository.find({ where: { usuario } });
   }
 
-  async findByIdAndUsuario(policiaId: number, uid_codigo: string): Promise<Policia | null> {
-    return await this.repository.findOne({ where: { policia_id: policiaId, usuario: { uid_codigo: uid_codigo } } });
+  async findByIdAndUsuario(
+    policiaId: number,
+    uid_codigo: string,
+  ): Promise<Policia | null> {
+    return await this.repository.findOne({
+      where: { policia_id: policiaId, usuario: { uid_codigo: uid_codigo } },
+    });
   }
 
   async delete(policia: Policia): Promise<void> {

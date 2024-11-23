@@ -62,6 +62,7 @@ export class AccidenteUseCase {
     this.logger.error(mensajeCompleto);
     // Notificar a los familiares
     for (const familiar of persona.familiares || []) {
+      this.logger.log(`Notificación de emergencia para familiar:\n\n Estimado(a) ${familiar.nombre}${mensajeCompleto}`);
       await this.whatsAppService.sendWhatsAppMessage(
         familiar.telefono,
         `Notificación de emergencia para familiar:\n\n Estimado(a) ${familiar.nombre}${mensajeCompleto}`
@@ -117,7 +118,7 @@ export class AccidenteUseCase {
     // Save accident information
     const accidente= await this.accidenteRepository.savewithVehiculoCercano(usuario, fullAnalysis,streetname,url.secure_url,url.name);
     if (fullAnalysis.accidentDetected){
-      this.notificationStateObserver.notify(usuario.token_messagin,usuario.uid_codigo,accidente.accidente_id, 'accidente_detectado');
+      this.notificationStateObserver.notify(usuario.token_messagin,usuario.uid_codigo,accidente.accidente_id,url.secure_url, 'accidente_detectado');
     }
     return { analysis: [fullAnalysis] };
   }

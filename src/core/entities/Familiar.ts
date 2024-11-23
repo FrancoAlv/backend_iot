@@ -20,4 +20,8 @@ export class Familiar {
 
   @Column()
   relacion: string;
+
+  @Column({nullable: true})
+  isActive: boolean;
+
 }
